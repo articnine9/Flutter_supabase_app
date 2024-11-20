@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'auth_page.dart';
+import 'package:model_app/pages/account_page.dart';
+import 'package:model_app/pages/login_page.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
+Future<void> main() async {
   await Supabase.initialize(
-    url: 'https://lteiwxmsegqopasafwug.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0ZWl3eG1zZWdxb3Bhc2Fmd3VnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjk0ODc0MzUsImV4cCI6MjA0NTA2MzQzNX0.N9J9wun553udD_HdegHeXkfLgbzyMcAT6N9OxABn5HQ',
+   url: 'https://qynhybdsfpzjuovzrdxa.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF5bmh5YmRzZnB6anVvdnpyZHhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjk1MDg2MTEsImV4cCI6MjA0NTA4NDYxMX0.L3EhfYXNQcRfutf7QA3OodHk0amVEj1HABS3sepuc8E',
   );
-
   runApp(const MyApp());
 }
+
+final supabase = Supabase.instance.client;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -19,11 +19,37 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Login Signup App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+      title: 'Supabase Flutter',
+      theme: ThemeData.dark().copyWith(
+        primaryColor: Colors.green,
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.green,
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.green,
+          ),
+        ),
       ),
-      home: const AuthPage(),
+      home: supabase.auth.currentSession == null
+          ? const LoginPage()
+          : const AccountPage(),
+    );
+  }
+}
+
+extension ContextExtension on BuildContext {
+  void showSnackBar(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(this).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError
+            ? Theme.of(this).colorScheme.error
+            : Theme.of(this).snackBarTheme.backgroundColor,
+      ),
     );
   }
 }
